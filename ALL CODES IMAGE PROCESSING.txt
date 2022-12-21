@@ -1,0 +1,554 @@
+Lesson1: Extracting image properties
+%Filename,Image Modification,File size, Width, height,Bit depth
+%Color Type, Number of samples, Coding method and coding Process
+clc
+clear all
+
+info = imfinfo("C:\Users\CHUCH\Desktop\IMAGE PROCESSING USING MATLAB\Peacock.jpg");
+image_name = info.Filename
+image_mod = info.FileModDate
+image_size = info.FileSize
+image_width = info.Width
+image_height = info.Height
+image_colordepth = info.BitDepth
+image_colortype = info.ColorType
+image_samplenumber = info.NumberOfSamples
+image_codingmethod = info.CodingMethod
+image_codingprocess = info.CodingProcess
+
+Lesson2: Reading Changing Format and Writing Image
+%Reading Changing and Writing Image in another format
+clc
+clear all
+
+image = imread('C:\Users\CHUCH\Desktop\IMAGE PROCESSING USING MATLAB\Bird.jpg');
+imwrite(image, 'C:\Users\CHUCH\Desktop\IMAGE PROCESSING USING MATLAB\Birdupdate.png', 'png')
+
+Lesson3: Displaying images
+%Displaying Images
+clc
+clear all
+image1 = imread('C:\Users\CHUCH\Desktop\IMAGE PROCESSING USING MATLAB\Bird.jpg');
+image2 = imread('C:\Users\CHUCH\Desktop\IMAGE PROCESSING USING MATLAB\Peacock.jpg');
+image3 = imread('C:\Users\CHUCH\Desktop\IMAGE PROCESSING USING MATLAB\Panda.jpg');
+image4 = imread('C:\Users\CHUCH\Desktop\IMAGE PROCESSING USING MATLAB\Owl.jpg');
+
+subplot(2,2,1); imshow(image1)
+subplot(2,2,2); imshow(image2)
+subplot(2,2,3); imshow(image3)
+subplot(2,2,4); imshow(image4)
+
+Lesson4: Changing Color space
+%Converting Color space
+image1 = imread('C:\Users\CHUCH\Desktop\IMAGE PROCESSING USING MATLAB\Bird.jpg');
+image2 = rgb2gray(image1);
+
+subplot(1,2,1); imshow(image1)
+subplot(1,2,2); imshow(image2)
+
+Lesson5: Separating Channels
+%Separating channels
+clc
+clear all
+image1 = imread('C:\Users\CHUCH\Desktop\IMAGE PROCESSING USING MATLAB\Peacock.jpg');
+red_channel = image1(:,:,1);
+green_channel = image1(:,:,2);
+blue_channel = image1(:,:,3);
+subplot(2,2,1); imshow(image1); title('ORIGINAL')
+subplot(2,2,2); imshow(red_channel); title('RED')
+subplot(2,2,3); imshow(green_channel); title('GREEN')
+subplot(2,2,4); imshow(blue_channel); title('BLUE ')
+
+Lesson6: Accessing the Pixel Value of Grayscale Image
+%Accessing the pixel value of grayscale image
+clc
+clear all
+image1 = imread('C:\Users\CHUCH\Desktop\IMAGE PROCESSING USING MATLAB\Panda.jpg');
+image2 = rgb2gray(image1);
+pixelvalue = image2(50,40);
+sprintf('The value of pixel at location is %d', pixelvalue)
+
+Lesson7: Accessing pixel value of RGB image
+%Accessing pixel value of RGB Image
+clc
+clear all
+image1 = imread('C:\Users\CHUCH\Desktop\IMAGE PROCESSING USING MATLAB\Panda.jpg');
+pixelvalue = image1(50,40);
+red_value = image1(50,40,1);
+green_value = image1(50,40,2);
+blue_value = image1(50,40,3);
+sprintf('The value of pixel at location, red, green and blue is %d, %d, %d, %d', pixelvalue,red_value,green_value,blue_value)
+
+Lesson8: Convolution of 1D signal
+%Convolution of 1D signal
+clc
+clear all
+signal = ones(64,1);
+%Normalizing the signal
+N_signal = signal./sum(signal);
+conv1 = conv(N_signal, N_signal);
+%Normalizing the first convoluted signal
+N_conv1 = conv1./sum(conv1);
+conv2 = conv(N_conv1, N_conv1);
+%Normalizing the second convoluted signal
+N_conv2 = conv2./sum(conv2);
+conv3 = conv(N_conv2, N_conv2);
+
+subplot(2,2,1); plot(signal); title('Original Signal'); axis off
+subplot(2,2,2); plot(conv1); title('First Convolution o/p'); axis off
+subplot(2,2,3); plot(conv2); title('Second Convolution o/p'); axis off
+subplot(2,2,4); plot(conv3); title('Third Convolution o/p'); axis off
+
+Lesson9: Convolution of 2D image
+%Convolution of 2D image
+clc
+clear all
+image = imread('C:\Users\CHUCH\Desktop\IMAGE PROCESSING USING MATLAB\Panda.jpg');
+image2 = rgb2gray(image);
+image3 = double(image2);
+%Gaussian Filter
+%h = imgaussfilt(image,sigma) returns a rotationally symmetric 
+%Gaussian lowpass filter of size hsize with standard deviation sigma
+Gaussian = fspecial('gaussian',[3 3], 2);  
+%Motion filter
+%h = fspecial('motion',len,theta) returns a filter to approximate, 
+%once convolved with an image, the linear motion of a camera. 
+%len specifies the length of the motion and theta specifies the 
+%angle of motion in degrees in a counter-clockwise direction.
+Motion = fspecial('Motion',400,45);
+%Convolution
+conv_with_gaussian_filter = conv2(Gaussian,image3);
+conv_with_motion_filter = imfilter(Motion,image3, 'replicate');
+self_conv = conv2(image3, image3);
+
+%Plotting
+subplot(2,3,1); imshow(image);title('Original Image')
+subplot(2,3,2); imshow(image2);title('Grayscale Image')
+subplot(2,3,3); imshow(conv_with_gaussian_filter,[]);title('Gaussian filter')
+subplot(2,3,4); imshow(conv_with_motion_filter,[]);title('Motion Filter')
+subplot(2,3,5); imshow(self_conv,[]);title('Self convolution')
+
+Lesson10: Image construction using sample points
+%image construction from sample points
+clc
+clear all
+image = imread('C:\Users\CHUCH\Desktop\IMAGE PROCESSING USING MATLAB\Panda.jpg');
+image1 = rgb2gray(image);
+image2 = double(image1);
+[rows, columns] = size(image2); %Get image dimensions
+zero_image = zeros(size(image2)); %Construct zero image of equal size
+random_points = rand(rows.*columns,1)<0.90 %Random sample
+zero_image(random_points) = image2(random_points);
+%Applying gaussian filter
+gaussian = fspecial('gaussian', [10 10], 2);
+convolution = conv2(gaussian, zero_image);
+%Plotting
+subplot(3,2,1); imagesc(image);title('Original');axis off
+subplot(3,2,2); imagesc(image1);title('Gray image'); axis off
+subplot(3,2,3); imagesc(image2);title('Doubles array'); axis off
+subplot(3,2,4); imagesc(zero_image);title('Zero Image'); axis off
+subplot(3,2,5); imagesc(convolution);title('Convoluted Image'); axis off
+
+Lesson11: Adding Pixel value 
+%Arithmetic operation on image
+image = imread('C:\Users\CHUCH\Desktop\IMAGE PROCESSING USING MATLAB\Panda.jpg');
+adding_50 = imadd(image,50);
+adding_100 = imadd(image,100);
+adding_150 = imadd(image,150);
+adding_200 = imadd(image, 200);
+
+subplot(2,2,1); imshow(adding_50);
+subplot(2,2,2); imshow(adding_100);
+subplot(2,2,3); imshow(adding_150);
+subplot(2,2,4); imshow(adding_200);
+
+Lesson12: Image Subtraction
+%Image subtraction
+image1 = imread('C:\Users\CHUCH\Desktop\IMAGE PROCESSING USING MATLAB\Panda.jpg');
+image2 = imread('C:\Users\CHUCH\Desktop\IMAGE PROCESSING USING MATLAB\Panda.jpg');
+sub = image1-image2;
+subplot(2,2,1); imshow(image1); title('1st image'); axis off
+subplot(2,2,2); imshow(image2); title('2nd image'); axis off
+subplot(2,2,3); imshow(sub); title('Subtracted image'); axis off
+
+Lesson13: Multiplication and Division on Image
+%Image Multiplication and division
+%Image contrast manipulation
+clc
+clear all
+image1 = imread('C:\Users\CHUCH\Desktop\IMAGE PROCESSING USING MATLAB\Panda.jpg');
+image_mul = immultiply(image1,1.5);
+image_div = imdivide(image1, 4);
+subplot(1,3,1); imshow(image1); title('ORIGINAL'); axis off
+subplot(1,3,2); imshow(image_mul); title("MULTIPLIED IMAGE"); axis off
+subplot(1,3,3); imshow(image_div); title('DIVIDED IMAGE'); axis off
+
+Lesson14: Image complement
+%Image_Complement
+%The darker part becomes bright and bright part becomes dark
+clc
+clear all
+image1 = imread('C:\Users\CHUCH\Desktop\IMAGE PROCESSING USING MATLAB\Panda.jpg');
+grayimage = rgb2gray(image1);
+comp = imcomplement(grayimage);
+subplot(1,3,1); imshow(image1); title('ORIGINAL'); axis off
+subplot(1,3,2); imshow(grayimage); title('GRAY IMAGE'); axis off
+subplot(1,3,3); imshow(comp); title('COMPLEMENT'); axis off
+
+Lesson15: XOR Operation
+%XOR Operation in images
+clc
+clear all
+image1 = imread('C:\Users\CHUCH\Desktop\IMAGE PROCESSING USING MATLAB\Peacock.jpg');
+image2 = imread('C:\Users\CHUCH\Desktop\IMAGE PROCESSING USING MATLAB\Bird.jpg');
+binary1 = im2bw(image1);
+binary2 = im2bw(image1);
+output = xor(binary1, binary2)
+subplot(3,2,1); imshow(image1); title('First Image');
+subplot(3,2,2); imshow(image1); title('Second Image');
+subplot(3,2,3); imshow(binary1); title('1st Binary Image');
+subplot(3,2,4); imshow(binary2); title('2nd Binary Image');
+subplot(3,2,5); imshow(output); title('OUTPUT Image');
+
+Lesson16: Changing Binary Threshold
+%Changing Binary Threshold
+%Black and White balance
+clc
+clear all
+image1 = imread('C:\Users\CHUCH\Desktop\IMAGE PROCESSING USING MATLAB\Peacock.jpg');
+binary = im2bw(image1);
+threshold_01 = im2bw(image1, 0.1);
+threshold_04 = im2bw(image1, 0.4);
+threshold_08 = im2bw(image1, 0.8);
+subplot(1,3,1); imshow(threshold_01);
+subplot(1,3,2); imshow(threshold_04);
+subplot(1,3,3); imshow(threshold_08);
+
+
+Lesson17: Logarithmic Transformation of Image
+%Logarithmic Transformation of image
+%Image enhancement as it expands dark pixels of the image as compared to higher pixel values
+clear all
+image1 = imread('C:\Users\CHUCH\Desktop\IMAGE PROCESSING USING MATLAB\Bird.jpg');
+gray = rgb2gray(image1);
+double = im2double(gray);
+out1 = 2*log(1+double);
+out2 = 2.5*log(1+double);
+out3 = 3*log(1+double);
+subplot(2,2,1);imshow(gray);
+subplot(2,2,2);imshow(out1);
+subplot(2,2,3);imshow(out2);
+subplot(2,2,4);imshow(out3);
+
+Lesson18: Exponential Transformation of Image
+
+%Exponential transformation
+%enhance high intensity pixel values.
+clear all
+image1 = imread('C:\Users\CHUCH\Desktop\IMAGE PROCESSING USING MATLAB\Panda.jpg');
+gray = rgb2gray(image1);
+double = im2double(gray);
+out1 = 4*(((1+0.3).^(double))-1);
+out2 = 4*(((1+0.6).^(double))-1);
+out3 = 4*(((1+0.9).^(double))-1);
+subplot(2,2,1);imshow(gray);
+subplot(2,2,2);imshow(out1);
+subplot(2,2,3);imshow(out2);
+subplot(2,2,4);imshow(out3);
+
+Lesson19: Power Law Transformation of Image
+%Power law transformation
+clc
+clear all
+image1 = imread('C:\Users\CHUCH\Desktop\IMAGE PROCESSING USING MATLAB\Panda.jpg');
+double = im2double(image1);
+out1 = 2*(double.^0.9); %Power less than 1 it behaves like logarithmic Transformtaion
+out2 = 2*(double.^1.5); %Power more than 1 it behaves like exponential Transformtaion
+out3 = 2*(double.^3.5);
+subplot(2,2,1);imshow(image1);
+subplot(2,2,2);imshow(out1);
+subplot(2,2,3);imshow(out2);
+subplot(2,2,4);imshow(out3);
+
+Lesson20: Histogram Analysis 
+%Histogram analysis
+%An image histogram is a type of histogram
+%that acts as a graphical representation of 
+%the tonal distribution in a digital image. 
+%It plots the number of pixels for each 
+%tonal value. By looking at the histogram 
+%for a specific image a viewer will be able
+%to judge the entire tonal distribution 
+%at a glance
+clc
+clear all
+image1 = imread('C:\Users\CHUCH\Desktop\IMAGE PROCESSING USING MATLAB\Histogram\Panda.jpg');
+subplot(1,2,1); imshow(image1);
+subplot(1,2,2); imhist(image1);
+
+Lesson21: Counting the Values of bins of Histogram
+clc
+clear all
+image1 = imread('C:\Users\CHUCH\Desktop\IMAGE PROCESSING USING MATLAB\Histogram\Panda.jpg');
+[counts, bins] = imhist(image1);
+%Value of bin at specific pixel
+counts(10)
+counts(30)
+
+Lesson22: threshold Selection for Image
+%Threshold Value of image
+%The thresholding process is sometimes described as separating an image into foreground values (black) and background values (white).
+clc
+clear all
+image1 = imread('C:\Users\CHUCH\Desktop\IMAGE PROCESSING USING MATLAB\Histogram\Scene.jpg');
+image2 = rgb2gray(image1);
+threshold_value = graythresh(image2);
+threshold_image = im2bw(image2, threshold_value);
+subplot(2,2,1);imshow(image1);
+subplot(2,2,2);imshow(image2);
+subplot(2,2,3);imshow(threshold_image);
+
+Lesson23: Adaptive Threshold in Image
+%Adaptive threshold to image
+%Adaptive theshold to image is used to overcome
+%the limitations of conventional, global
+%by using different thresholld at each pixel location
+clc
+clear all;
+image1 = imread('C:\Users\CHUCH\Desktop\IMAGE PROCESSING USING MATLAB\Histogram\Scene.jpg');
+filter = fspecial('average', [3 3]);
+mean_image = imfilter(image1, filter, 'replica');
+subtract = image1 - (mean_image + 20);
+blackwhite = im2bw(subtract,0);
+subplot(1,2,1); imshow(blackwhite); title('Threshold Image');
+subplot(1,2,2); imshow(image1); title('Original Image');
+
+Lesson24: Contrast Stretching in Image
+
+%Contrast Stretching
+%Contrast stretching (often called normalization) is
+%a simple image enhancement technique that attempts 
+%to improve the contrast in an image by 'stretching' 
+%the range of intensity values it contains to span a
+%desired range of values, the full range of pixel 
+%values that the image type concerned allows
+%(AMBIANCE & SHADOWS)
+clc
+clear all;
+image1 = imread('C:\Users\CHUCH\Desktop\IMAGE PROCESSING USING MATLAB\Histogram\Scene.jpg');
+adjust = imadjust(image1, stretchlim(image1,[0.05 0.95]),[]);
+subplot(2,2,1); imshow(image1), title('Original');
+subplot(2,2,2); imshow(adjust), title('Stretched Image');
+subplot(2,2,3); imhist(image1), title('Histogram of Original Image');
+subplot(2,2,4); imhist(adjust), title('Histogram of Stretched Image');
+
+
+Lesson25: Histogram Equalization in Image
+clc
+clear all
+image1 = imread('C:\Users\CHUCH\Desktop\IMAGE PROCESSING USING MATLAB\Histogram\Scene.jpg');
+Histogram = histeq(image1);
+subplot(2,2,1); imshow(image1); title('Original Image');
+subplot(2,2,2); imshow(Histogram); title('Histogram Equalized image');
+subplot(2,2,3); imhist(image1); title('Histogram of Original Image');
+subplot(2,2,4); imhist(Histogram); title('Histogram of Equalized Image');
+
+Lesson26: Histogram matching in Image Processing%Histogra matching
+clc
+clear all
+image1 = imread('C:\Users\CHUCH\Desktop\IMAGE PROCESSING USING MATLAB\Histogram\Scene.jpg');
+Match = 0:255;
+Histogram = histeq(image1,Match);
+subplot(2,2,1); imshow(image1); title('Original Image');
+subplot(2,2,2); imshow(Histogram); title('Histogram Matched image');
+subplot(2,2,3); imhist(image1); title('Histogram of Original Image');
+subplot(2,2,4); imhist(Histogram); title('Histogram of Matched Image');
+
+Lesson27: Color Histogram in Image processing
+
+%Color histogram
+clc
+clear all
+image1 = imread('C:\Users\CHUCH\Desktop\IMAGE PROCESSING USING MATLAB\Histogram\Scene.jpg');
+image2 = rgb2hsv(image1);
+Histogram = histeq(image2(:,:,2));
+image2(:,:,2) = Histogram;
+image3 = hsv2rgb(image2);
+
+subplot(2,2,1); imshow(image1); title('Original Image');
+subplot(2,2,2); imshow(image2); title('Color Histogram');
+subplot(2,2,3); imhist(image1); title('Histogram of Original Image');
+subplot(2,2,4); imhist(image2); title('Histogram of color Image');
+
+Lesson28: Max and min Filtering in Image Processing
+%Min and Max filter 
+clc
+clear all
+image1 = imread('C:\Users\CHUCH\Desktop\IMAGE PROCESSING USING MATLAB\Peacock.jpg');
+bw = im2bw(image1,0.6); %Convert to black and white image
+minf = @(x)min(x(:)); %Set min filter
+maxf = @(x)max(x(:)); %Set max filter
+min_Image = nlfilter(bw,[3 3], minf); %Apply over 3x3 neighborhood
+max_Image = nlfilter(bw,[3 3], maxf); %Apply over 3x3 neighborhood
+
+subplot(2,2,1); imshow(image1); title('Original Image');
+subplot(2,2,2); imshow(bw); title('Black/white');
+subplot(2,2,3); imshow(min_Image); title('Min');
+subplot(2,2,4); imshow(max_Image); title('Max');
+
+
+Lesson29: Adding Salt and Pepper Noise
+clc
+clear all
+image1 = imread('C:\Users\CHUCH\Desktop\IMAGE PROCESSING USING MATLAB\Bird.jpg');
+image2 = rgb2gray(image1)
+N = imnoise(image1,'salt & pepper',0.05);
+M = imnoise(image1,'gaussian',0.05);
+O = imnoise(image1,'poisson');
+P = imnoise(image1,'speckle',0.07);
+
+subplot(2,3,1); imshow(image1); title('Original');
+subplot(2,3,2); imshow(N); title('Salt & pepper');
+subplot(2,3,3); imshow(M); title('Gaussian');
+subplot(2,3,4); imshow(O); title('Poisson');
+subplot(2,3,5); imshow(P); title('Speckle');
+
+Lesson30: Removing Salt and Pepper Noise
+%Removing Salt and pepper
+clc
+clear all
+image1 = imread('C:\Users\CHUCH\Desktop\IMAGE PROCESSING USING MATLAB\Bird.jpg');
+N = imnoise(image1,'salt & pepper', 0.05);
+mf = ones(3,3)/10; %Convolutional kernel
+noise_free = imfilter(N,mf);
+subplot(2,2,1); imshow(image1);
+subplot(2,2,2); imshow(N);
+subplot(2,2,3); imshow(noise_free);
+
+Lesson31: Median Filter to remove noise from Image
+%Filter to remove noise
+clc
+clear all
+image1 = imread('C:\Users\CHUCH\Desktop\IMAGE PROCESSING USING MATLAB\Bird.jpg');
+N = imnoise(image1,'salt & pepper', 0.3);
+red_channel = N(:,:,1);
+green_channel = N(:,:,2);
+blue_channel = N(:,:,3);
+
+red_filter = medfilt2(red_channel, [3 3]);
+green_filter = medfilt2(green_channel, [3 3]);
+blue_filter = medfilt2(blue_channel, [3 3]);
+
+F = cat(3,red_filter, green_filter, blue_filter);
+
+subplot(2,1,1);
+imshow(N);
+title('Noisy Image');
+
+subplot(2,1,2);
+imshow(F);
+title('After Noise Removal');
+
+Lesson32: Rank Filter
+%Rank Filter (Generalized order filter)
+clc
+clear all
+image1 = imread('C:\Users\CHUCH\Desktop\IMAGE PROCESSING USING MATLAB\Bird.jpg');
+N = imnoise(image1,'salt & pepper', 0.3);
+red_channel = N(:,:,1);
+green_channel = N(:,:,2);
+blue_channel = N(:,:,3);
+
+red_filter = ordfilt2(red_channel, 15, ones(5,5));
+green_filter = ordfilt2(green_channel, 15, ones(5,5));
+blue_filter = ordfilt2(blue_channel, 15, ones(5,5));
+
+F = cat(3,red_filter, green_filter, blue_filter);
+
+subplot(2,1,1);
+imshow(N);
+title('Noisy Image');
+
+subplot(2,1,2);
+imshow(F);
+title('After Noise Removal');
+
+
+
+Lesson33: Gaussian Filter
+%Gaussian filter
+clc
+clear all
+image1 = imread('C:\Users\CHUCH\Desktop\IMAGE PROCESSING USING MATLAB\Bird.jpg');
+N = imnoise(image1,'salt & pepper', 0.3);
+red_channel = N(:,:,1);
+green_channel = N(:,:,2);
+blue_channel = N(:,:,3);
+Filter = fspecial('gaussian', [10 10], 4);
+red_filter = imfilter(red_channel, Filter);
+green_filter = imfilter(green_channel, Filter);
+blue_filter = imfilter(blue_channel, Filter);
+
+F = cat(3,red_filter, green_filter, blue_filter);
+
+subplot(2,1,1);
+imshow(N);
+title('Noisy Image');
+
+subplot(2,1,2);
+imshow(F);
+title('After Noise Removal');
+
+Lesson34: Roberts Edge detector
+%Robert Edge Detector
+clc
+clear all
+image1 = imread('C:\Users\CHUCH\Desktop\IMAGE PROCESSING USING MATLAB\Histogram\Panda.jpg');
+image2 = rgb2gray(image1);
+F = edge(image2, 'roberts');
+subplot(1,3,1); imshow(image1);
+subplot(1,3,2); imshow(image2);
+subplot(1,3,3); imshow(F);
+
+Lesson35: Prewitt Edge Detection
+%Prewitt edge detection
+clc
+clear all
+image1 = imread('C:\Users\CHUCH\Desktop\IMAGE PROCESSING USING MATLAB\Histogram\Panda.jpg');
+image2 = rgb2gray(image1);
+F = edge(image2, 'prewitt');
+subplot(1,3,1); imshow(image1);
+subplot(1,3,2); imshow(image2);
+subplot(1,3,3); imshow(F);
+
+Lesson36: Sober edge detector
+%Sobel edge detector
+clc
+clear all
+image1 = imread('C:\Users\CHUCH\Desktop\IMAGE PROCESSING USING MATLAB\Histogram\Panda.jpg');
+image2 = rgb2gray(image1);
+F = edge(image2, 'sobel');
+subplot(1,3,1); imshow(image1);
+subplot(1,3,2); imshow(image2);
+subplot(1,3,3); imshow(F);
+
+Lesosn37: Edge Detection in Videos
+%Edge detection in videos
+clear all
+cam = webcam();
+cam.Resolution = '640x480';
+h = figure;
+while ishandle(h)
+    I = snapshot(cam);
+    G = rgb2gray(I);
+    Rob = edge(G, 'roberts');
+    Sob = edge(G, 'sobel');
+    Pre = edge(G, 'prewitt');
+    
+    subplot(2,2,1); imshow(I); title('ORIGINAL');
+    subplot(2,2,2); imshow(Rob); title('ROBERTS');
+    subplot(2,2,3); imshow(Sob); title('SOBEL');
+    subplot(2,2,4); imshow(Pre); title('PREWITT');
+    
+    drawnow
+end
